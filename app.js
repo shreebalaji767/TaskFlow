@@ -440,8 +440,10 @@
       }).catch(function () { try { new Notification(title, options); } catch (_) {} });
     } else { try { new Notification(title, options); } catch (_) {} }
   }
+  // A static site cannot wake itself while the browser/app is fully closed.
+  // On startup or return, deliver one catch-up notification for tasks overdue by <=24 hours.
   let lastReminderCheck = Date.now();
-  function checkReminders() {
+  function checkReminders(includeRecentMisses) {
     const now = Date.now();
     let notified = [];
     try { notified = JSON.parse(safeGet(NOTIFIED_KEY) || "[]"); } catch (_) {}
@@ -450,17 +452,21 @@
       if (task.completed || !task.dueDate || !task.dueTime) return;
       const dueAt = new Date(task.dueDate + "T" + task.dueTime).getTime();
       const reminderId = task.id + "|" + task.dueDate + "|" + task.dueTime;
-      if (Number.isFinite(dueAt) && dueAt > lastReminderCheck && dueAt <= now && !notifiedSet.has(reminderId)) {
+      const becameDueWhileRunning = dueAt > lastReminderCheck && dueAt <= now;
+      const recentlyMissed = includeRecentMisses && dueAt <= now && now - dueAt <= 24 * 60 * 60 * 1000;
+      if (Number.isFinite(dueAt) && (becameDueWhileRunning || recentlyMissed) && !notifiedSet.has(reminderId)) {
         notifiedSet.add(reminderId);
-        notifyTask(task);
+        notifyTask(task, recentlyMissed && !becameDueWhileRunning);
       }
     });
     lastReminderCheck = now;
     try { localStorage.setItem(NOTIFIED_KEY, JSON.stringify(Array.from(notifiedSet).slice(-500))); } catch (_) {}
   }
   updateReminderButton();
-  window.setInterval(checkReminders, 15000);
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) checkReminders(); });
+  // Startup check catches recent reminders missed while TaskFlow was closed.
+  checkReminders(true);
+  window.setInterval(function () { checkReminders(false); }, 15000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) checkReminders(true); });
 
   updateThemeIcon();
   render();
