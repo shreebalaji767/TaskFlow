@@ -91,7 +91,7 @@
     '  <article class="stat"><div class="stat-top"><span>Completed</span><span class="stat-icon">' + icons.done + '</span></div><div class="stat-number green" id="done-count">0</div></article>',
     ' </section>',
     ' <section class="board" aria-labelledby="board-title">',
-    '  <div class="board-head"><div><h2 id="board-title">Your tasks</h2><div class="board-caption">Capture it, prioritize it, get it done.</div></div><div class="board-head-actions"><button class="export-btn install-btn" id="install-btn" type="button" hidden><span class="install-icon">↓</span><span>Install app</span></button><button class="export-btn" id="export-btn" type="button">' + icons.export + '<span>Export tasks</span></button></div></div>',
+    '  <div class="board-head"><div><h2 id="board-title">Your tasks</h2><div class="board-caption">Capture it, prioritize it, get it done.</div></div><div class="board-head-actions"><button class="export-btn install-btn" id="install-btn" type="button" hidden><span class="install-icon">↓</span><span>Install app</span></button><button class="export-btn" id="import-btn" type="button">↥<span>Import backup</span></button><input id="import-input" type="file" accept="application/json,.json" hidden><button class="export-btn" id="export-btn" type="button">' + icons.export + '<span>Export tasks</span></button></div></div>',
     '  <form class="add-form" id="add-form"><label class="sr-only" for="task-input">Task name</label><input class="field" id="task-input" maxlength="200" autocomplete="off" placeholder="What needs to get done?" required><label class="sr-only" for="priority-input">Priority</label><select class="field" id="priority-input"><option value="medium">◈ Medium priority</option><option value="high">▲ High priority</option><option value="low">▽ Low priority</option></select><label class="sr-only" for="due-input">Due date</label><input class="field" id="due-input" type="date" aria-label="Optional due date"><button class="add-btn" type="submit">' + icons.check + '<span>Add task</span></button></form>',
     '  <div class="tools"><nav class="filters" aria-label="Filter tasks"><button class="filter-btn active" data-filter="all" type="button" aria-pressed="true">All</button><button class="filter-btn" data-filter="active" type="button" aria-pressed="false">Active</button><button class="filter-btn" data-filter="completed" type="button" aria-pressed="false">Completed</button></nav><div class="tool-right"><label class="sr-only" for="search-input">Search tasks</label><input class="field search" id="search-input" type="search" placeholder="Search tasks..."><label class="sr-only" for="sort-select">Sort tasks</label><select class="field sort" id="sort-select"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="priority">Priority</option><option value="due">Due date</option></select></div></div>',
     '  <div class="task-list" id="task-list" aria-live="polite"></div>',
@@ -281,6 +281,42 @@
     $("#theme-toggle").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
     $("#theme-toggle").title = dark ? "Switch to light theme" : "Switch to dark theme";
   }
+  $("#import-btn").addEventListener("click", function () {
+    $("#import-input").click();
+  });
+  $("#import-input").addEventListener("change", async function (event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try {
+      const parsed = JSON.parse(await file.text());
+      const imported = Array.isArray(parsed) ? parsed : parsed && Array.isArray(parsed.tasks) ? parsed.tasks : null;
+      if (!imported) throw new Error("This file does not contain a TaskFlow task list.");
+      const cleaned = imported.filter(function (task) {
+        return task && typeof task.title === "string" && task.title.trim();
+      }).map(function (task) {
+        const dueDate = typeof task.dueDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(task.dueDate) ? task.dueDate : "";
+        return {
+          id: typeof task.id === "string" && task.id ? task.id : makeId(),
+          title: task.title.trim().slice(0, 200),
+          completed: Boolean(task.completed),
+          createdAt: Number(task.createdAt) || Date.now(),
+          priority: ["low", "medium", "high"].includes(task.priority) ? task.priority : "medium",
+          dueDate: dueDate
+        };
+      });
+      if (!cleaned.length && imported.length) throw new Error("No valid tasks were found in this backup.");
+      if (!window.confirm("Restore " + cleaned.length + " task(s) from this backup? This replaces the current task list.")) return;
+      tasks = cleaned;
+      saveTasks();
+      render();
+      showToast("Backup restored successfully");
+    } catch (error) {
+      window.alert("Could not import this backup. Please choose a valid TaskFlow JSON export.\\n\\n" + (error.message || "Unknown error"));
+    } finally {
+      event.target.value = "";
+    }
+  });
+
   $("#export-btn").addEventListener("click", function () {
     const payload = JSON.stringify({ exportedAt: new Date().toISOString(), app: "TaskFlow", tasks: tasks }, null, 2);
     const blob = new Blob([payload], { type: "application/json" });
