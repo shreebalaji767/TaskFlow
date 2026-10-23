@@ -428,10 +428,11 @@
       showToast(permission === "granted" ? "Reminders enabled — keep TaskFlow open for alerts" : "Notification permission was not granted");
     } catch (_) { showToast("Could not enable notifications in this browser"); }
   });
-  function notifyTask(task) {
+  function notifyTask(task, isMissed) {
     if (!("Notification" in window) || Notification.permission !== "granted") return;
-    const title = "TaskFlow reminder";
-    const options = { body: task.title + " is due now.", tag: "taskflow-" + task.id, icon: "./favicon.svg", badge: "./favicon.svg", data: { taskId: task.id } };
+    const title = isMissed ? "TaskFlow missed reminder" : "TaskFlow reminder";
+    const dueLabel = task.dueTime ? " at " + task.dueTime : "";
+    const options = { body: isMissed ? task.title + " was due on " + task.dueDate + dueLabel + "." : task.title + " is due now.", tag: "taskflow-" + task.id, icon: "./favicon.svg", badge: "./favicon.svg", data: { taskId: task.id } };
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.ready.then(function (registration) {
         if (registration.showNotification) return registration.showNotification(title, options);
