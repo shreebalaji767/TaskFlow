@@ -294,7 +294,7 @@
       const cleaned = imported.filter(function (task) {
         return task && typeof task.title === "string" && task.title.trim();
       }).map(function (task) {
-        const dueDate = typeof task.dueDate === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(task.dueDate) ? task.dueDate : "";
+        const dueDate = typeof task.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(task.dueDate) ? task.dueDate : "";
         return {
           id: typeof task.id === "string" && task.id ? task.id : makeId(),
           title: task.title.trim().slice(0, 200),
