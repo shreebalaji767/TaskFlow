@@ -14,7 +14,7 @@
 - **Sorting** — organize by newest, oldest, priority, or due date.
 - **Progress dashboard** — see total, active, and completed task counts plus a completion bar.
 - **Light and dark themes** — choose a comfortable look; the theme preference is saved.
-- **Export and backup** — download tasks as a JSON file.
+- **Backup and restore** — export tasks as JSON and import a TaskFlow backup to restore your list.
 - **Installable PWA** — install TaskFlow on supported browsers and use its cached app shell offline after the first successful load.
 - **App icon** — custom SVG favicon and app icon.
 - **Keyboard shortcuts** — press `/` to focus search, or `Ctrl+K` (`⌘K` on Mac) to focus search.
