@@ -9,7 +9,8 @@
 
 - **Task management** — add, edit, complete, and delete tasks.
 - **Priority levels** — label tasks as high, medium, or low priority.
-- **Due dates** — add deadlines and see overdue tasks highlighted.
+- **Due dates and times** — set a due date and exact reminder time; overdue tasks are highlighted.
+- **Browser notifications** — enable notifications and receive a reminder when a task is due while TaskFlow is open. Browser permission is required.
 - **Search and filters** — find tasks and switch between all, active, and completed.
 - **Sorting** — organize by newest, oldest, priority, or due date.
 - **Progress dashboard** — see total, active, and completed task counts plus a completion bar.
@@ -27,7 +28,7 @@ TaskFlow uses **vanilla JavaScript** to create the app interface and inject its 
 
 - `app.js` creates the page elements, adds styles through a dynamically created `<style>` element, and handles application behavior.
 - `index.html` stays minimal, links the favicon and web app manifest, and loads `app.js`.
-- `app.js` creates the install button, handles supported browser install prompts, and registers the service worker.
+- `app.js` creates the install and reminder controls, handles supported browser install prompts and browser notifications, and registers the service worker.
 - `manifest.webmanifest` describes the installable app; `sw.js` caches the app shell for offline loading.
 - There is **no separate CSS file** and no frontend framework.
 
