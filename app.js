@@ -352,22 +352,21 @@
   // Export reminders to the user's own calendar; no account, server, or paid service required.
   $("#calendar-btn").addEventListener("click", function () {
     const upcoming = tasks.filter(function (task) {
-      return !task.completed && task.dueDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(task.dueDate);
+      return !task.completed && task.dueDate && /^\d{4}-\d{2}-\d{2}$/.test(task.dueDate);
     });
     if (!upcoming.length) {
       showToast("Add a due date to a task before exporting calendar reminders");
       return;
     }
     function escapeICS(value) {
-      return String(value || "").replace(/\\\\/g, "\\\\\\\\").replace(/\\r?\\n/g, "\\\\n").replace(/,/g, "\\\\,").replace(/;/g, "\\\\;");
+      return String(value || "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
     }
     function localStamp(date, time) {
       return date.replace(/-/g, "") + "T" + (time || "09:00").replace(":", "") + "00";
     }
-    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\\.\\d{3}/, "");
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
     const events = upcoming.map(function (task) {
       const start = localStamp(task.dueDate, task.dueTime);
-      const startDate = task.dueDate.replace(/-/g, "");
       const end = localStamp(task.dueDate, task.dueTime ? addMinutes(task.dueTime, 15) : "09:15");
       return [
         "BEGIN:VEVENT",
@@ -383,9 +382,9 @@
         "DESCRIPTION:" + escapeICS("Upcoming task: " + task.title),
         "END:VALARM",
         "END:VEVENT"
-      ].join("\\r\\n");
+      ].join("\r\n");
     });
-    const calendar = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TaskFlow//Local Reminders//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH"].concat(events).concat(["END:VCALENDAR"]).join("\\r\\n") + "\\r\\n";
+    const calendar = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//TaskFlow//Local Reminders//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"].concat(events).concat(["END:VCALENDAR"]).join("\r\n") + "\r\n";
     const blob = new Blob([calendar], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
