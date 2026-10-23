@@ -3,6 +3,7 @@
 
   const STORAGE_KEY = "taskflow.tasks.v1";
   const THEME_KEY = "taskflow.theme.v1";
+  const NOTIFIED_KEY = "taskflow.notified.v1";
   const $ = (selector, root) => (root || document).querySelector(selector);
   const $$ = (selector, root) => Array.from((root || document).querySelectorAll(selector));
 
@@ -15,7 +16,7 @@
     ".hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:25px}.eyebrow{margin:0 0 10px;color:var(--brand);font-size:11px;font-weight:850;letter-spacing:1.7px;text-transform:uppercase}.hero h1{margin:0;font-size:clamp(31px,5.5vw,46px);line-height:1.08;letter-spacing:-2px}.hero p.sub{margin:12px 0 0;color:var(--muted);font-size:14px;line-height:1.65}.hero-note{max-width:210px;color:var(--muted);font-size:12px;line-height:1.6;text-align:right}.hero-note strong{display:block;color:var(--text);font-size:13px;margin-bottom:3px}",
     ".stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:26px 0}.stat{min-width:0;padding:18px 19px;background:var(--surface);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}.stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:650}.stat-icon{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border-radius:11px;background:var(--brand-2);color:var(--brand)}.stat-icon svg{width:17px;height:17px}.stat-number{font-size:30px;font-weight:850;letter-spacing:-1px;margin-top:11px}.stat-number.green{color:var(--green)}.progress-track{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:12px}.progress-fill{height:100%;width:0;background:var(--green);border-radius:99px;transition:width .25s}",
     ".board{background:var(--surface);border:1px solid var(--line);border-radius:23px;padding:23px;box-shadow:var(--shadow)}.board-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:19px}.board-head h2{font-size:18px;letter-spacing:-.5px;margin:0}.board-caption{font-size:11px;color:var(--muted);margin-top:5px}.export-btn{display:flex;align-items:center;gap:7px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:11px;font-weight:750}.export-btn:hover{color:var(--brand);border-color:var(--brand)}.export-btn svg{width:15px;height:15px}.board-head-actions{display:flex;align-items:center;gap:8px}.install-btn[hidden]{display:none}.install-btn{background:var(--brand-2);color:var(--brand);border-color:color-mix(in srgb,var(--brand) 22%,var(--line))}.install-icon{display:grid;place-items:center;width:15px;height:15px;font-size:18px;font-weight:900;line-height:1}",
-    ".add-form{display:grid;grid-template-columns:minmax(0,1fr) 132px 145px auto;gap:9px;margin-bottom:17px}.field{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:12px;padding:12px 13px;font-size:13px}.field:focus{outline:none;border-color:var(--brand)}.field::placeholder{color:var(--muted)}.add-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:0 17px;border:0;border-radius:12px;background:var(--brand);color:#fff;font-size:12px;font-weight:800;white-space:nowrap;min-height:44px}.add-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.add-btn svg{width:17px;height:17px}",
+    ".add-form{display:grid;grid-template-columns:minmax(0,1fr) 132px 140px 125px auto;gap:9px;margin-bottom:17px}.field{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:12px;padding:12px 13px;font-size:13px}.field:focus{outline:none;border-color:var(--brand)}.field::placeholder{color:var(--muted)}.add-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:0 17px;border:0;border-radius:12px;background:var(--brand);color:#fff;font-size:12px;font-weight:800;white-space:nowrap;min-height:44px}.add-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.add-btn svg{width:17px;height:17px}",
     ".tools{display:flex;align-items:center;justify-content:space-between;gap:13px;padding:13px 0 16px;border-bottom:1px solid var(--line);margin-bottom:14px}.filters{display:flex;gap:4px;flex-wrap:wrap}.filter-btn{border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:750;border-radius:9px;padding:8px 12px}.filter-btn.active{background:var(--brand-2);color:var(--brand)}.tool-right{display:flex;align-items:center;gap:8px;min-width:0}.search{width:190px;padding:9px 11px;border-radius:10px;font-size:12px}.sort{width:auto;max-width:125px;padding:9px 8px;border-radius:10px;font-size:11px}",
     ".task-list{display:grid;gap:9px}.task-item{display:flex;align-items:center;gap:12px;min-width:0;padding:14px 13px;border:1px solid var(--line);border-radius:14px;background:var(--surface);animation:rise .16s ease;transition:border-color .15s,transform .15s}.task-item:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line));transform:translateY(-1px)}.task-item.done{background:var(--surface-2)}.task-check{appearance:none;display:grid;place-items:center;width:21px;height:21px;flex-shrink:0;margin:0;border:1.7px solid #b9bfd2;border-radius:7px;cursor:pointer}.task-check:checked{background:var(--green);border-color:var(--green)}.task-check:checked:after{content:'✓';color:#fff;font-size:13px;font-weight:900}.task-copy{flex:1;min-width:0}.task-title{font-size:13px;line-height:1.5;overflow-wrap:anywhere}.done .task-title{color:var(--muted);text-decoration:line-through}.task-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:6px;color:var(--muted);font-size:10px}.priority,.due-chip{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:4px 7px;font-size:9px;font-weight:800;letter-spacing:.2px}.priority.high{background:color-mix(in srgb,var(--red) 12%,var(--surface));color:var(--red)}.priority.medium{background:var(--amber-soft);color:var(--amber)}.priority.low{background:var(--green-soft);color:var(--green)}.due-chip{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}.due-chip.overdue{color:var(--red);background:color-mix(in srgb,var(--red) 10%,var(--surface));border-color:color-mix(in srgb,var(--red) 25%,var(--line))}.task-actions{display:flex;align-items:center;gap:3px;flex-shrink:0}.mini-btn{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:var(--muted)}.mini-btn:hover{background:var(--surface-2);color:var(--brand)}.mini-btn.delete:hover{color:var(--red)}.mini-btn svg{width:16px;height:16px}",
     ".empty{padding:42px 12px 35px;text-align:center}.empty-icon{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 14px;border-radius:18px;background:var(--brand-2);color:var(--brand)}.empty-icon svg{width:26px;height:26px}.empty h3{font-size:15px;margin:0 0 7px}.empty p{max-width:280px;margin:0 auto;color:var(--muted);font-size:12px;line-height:1.65}.board-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;margin-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.text-btn{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:6px}.text-btn:hover{color:var(--brand)}.storage-note{display:flex;align-items:center;justify-content:center;gap:7px;margin:16px 0 0;color:var(--muted);font-size:11px;text-align:center}.storage-note svg{width:14px;height:14px}.footer{text-align:center;padding:26px 0 0;color:var(--muted);font-size:11px}.footer strong{color:var(--text)}",
@@ -44,7 +45,8 @@
           completed: Boolean(task.completed),
           createdAt: Number(task.createdAt) || Date.now(),
           priority: ["low", "medium", "high"].includes(task.priority) ? task.priority : "medium",
-          dueDate: typeof task.dueDate === "string" ? task.dueDate : ""
+          dueDate: typeof task.dueDate === "string" ? task.dueDate : "",
+          dueTime: typeof task.dueTime === "string" && /^\d{2}:\d{2}$/.test(task.dueTime) ? task.dueTime : ""
         };
       });
     } catch (_) { return []; }
@@ -91,8 +93,8 @@
     '  <article class="stat"><div class="stat-top"><span>Completed</span><span class="stat-icon">' + icons.done + '</span></div><div class="stat-number green" id="done-count">0</div></article>',
     ' </section>',
     ' <section class="board" aria-labelledby="board-title">',
-    '  <div class="board-head"><div><h2 id="board-title">Your tasks</h2><div class="board-caption">Capture it, prioritize it, get it done.</div></div><div class="board-head-actions"><button class="export-btn install-btn" id="install-btn" type="button" hidden><span class="install-icon">↓</span><span>Install app</span></button><button class="export-btn" id="import-btn" type="button">↥<span>Import backup</span></button><input id="import-input" type="file" accept="application/json,.json" hidden><button class="export-btn" id="export-btn" type="button">' + icons.export + '<span>Export tasks</span></button></div></div>',
-    '  <form class="add-form" id="add-form"><label class="sr-only" for="task-input">Task name</label><input class="field" id="task-input" maxlength="200" autocomplete="off" placeholder="What needs to get done?" required><label class="sr-only" for="priority-input">Priority</label><select class="field" id="priority-input"><option value="medium">◈ Medium priority</option><option value="high">▲ High priority</option><option value="low">▽ Low priority</option></select><label class="sr-only" for="due-input">Due date</label><input class="field" id="due-input" type="date" aria-label="Optional due date"><button class="add-btn" type="submit">' + icons.check + '<span>Add task</span></button></form>',
+    '  <div class="board-head"><div><h2 id="board-title">Your tasks</h2><div class="board-caption">Capture it, prioritize it, get it done.</div></div><div class="board-head-actions"><button class="export-btn install-btn" id="install-btn" type="button" hidden><span class="install-icon">↓</span><span>Install app</span></button><button class="export-btn" id="reminder-btn" type="button" title="Enable browser reminders">🔔<span>Enable reminders</span></button><button class="export-btn" id="import-btn" type="button">↥<span>Import backup</span></button><input id="import-input" type="file" accept="application/json,.json" hidden><button class="export-btn" id="export-btn" type="button">' + icons.export + '<span>Export tasks</span></button></div></div>',
+    '  <form class="add-form" id="add-form"><label class="sr-only" for="task-input">Task name</label><input class="field" id="task-input" maxlength="200" autocomplete="off" placeholder="What needs to get done?" required><label class="sr-only" for="priority-input">Priority</label><select class="field" id="priority-input"><option value="medium">◈ Medium priority</option><option value="high">▲ High priority</option><option value="low">▽ Low priority</option></select><label class="sr-only" for="due-input">Due date</label><input class="field" id="due-input" type="date" aria-label="Optional due date"><label class="sr-only" for="time-input">Reminder time</label><input class="field" id="time-input" type="time" aria-label="Optional reminder time"><button class="add-btn" type="submit">' + icons.check + '<span>Add task</span></button></form>',
     '  <div class="tools"><nav class="filters" aria-label="Filter tasks"><button class="filter-btn active" data-filter="all" type="button" aria-pressed="true">All</button><button class="filter-btn" data-filter="active" type="button" aria-pressed="false">Active</button><button class="filter-btn" data-filter="completed" type="button" aria-pressed="false">Completed</button></nav><div class="tool-right"><label class="sr-only" for="search-input">Search tasks</label><input class="field search" id="search-input" type="search" placeholder="Search tasks..."><label class="sr-only" for="sort-select">Sort tasks</label><select class="field sort" id="sort-select"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="priority">Priority</option><option value="due">Due date</option></select></div></div>',
     '  <div class="task-list" id="task-list" aria-live="polite"></div>',
     '  <div class="board-footer"><span id="items-left">Nothing pending yet</span><button class="text-btn" id="clear-completed" type="button" disabled>Clear completed</button></div>',
@@ -126,6 +128,12 @@
     try {
       return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(value + "T12:00:00"));
     } catch (_) { return value; }
+  }
+  function formatTime(value) {
+    if (!value) return "";
+    const parts = value.split(":").map(Number);
+    const date = new Date(); date.setHours(parts[0], parts[1], 0, 0);
+    return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(date);
   }
   function isOverdue(task) {
     if (!task.dueDate || task.completed) return false;
@@ -197,7 +205,7 @@
       addElement(meta, "span", "priority " + task.priority, priorityLabel + " priority");
       addElement(meta, "span", "", (task.completed ? "Completed" : "Added") + " · " + formatDate(new Date(task.createdAt).toISOString().slice(0, 10)));
       if (task.dueDate) {
-        addElement(meta, "span", "due-chip" + (isOverdue(task) ? " overdue" : ""), (isOverdue(task) ? "Overdue · " : "Due · ") + formatDate(task.dueDate));
+        addElement(meta, "span", "due-chip" + (isOverdue(task) ? " overdue" : ""), (isOverdue(task) ? "Overdue · " : "Due · ") + formatDate(task.dueDate) + (task.dueTime ? " at " + formatTime(task.dueTime) : ""));
       }
 
       const actions = addElement(item, "div", "task-actions");
@@ -213,6 +221,8 @@
         if (nextPriority !== null && ["high", "medium", "low"].includes(nextPriority.trim().toLowerCase())) task.priority = nextPriority.trim().toLowerCase();
         const nextDue = window.prompt("Due date (YYYY-MM-DD), or leave blank", task.dueDate || "");
         if (nextDue !== null && (!nextDue.trim() || /^\d{4}-\d{2}-\d{2}$/.test(nextDue.trim()))) task.dueDate = nextDue.trim();
+        const nextTime = window.prompt("Reminder time (HH:MM, 24-hour format), or leave blank", task.dueTime || "");
+        if (nextTime !== null && (!nextTime.trim() || /^\d{2}:\d{2}$/.test(nextTime.trim()))) task.dueTime = nextTime.trim();
         saveTasks(); render(); showToast("Task updated");
       });
       const del = addElement(actions, "button", "mini-btn delete");
@@ -237,10 +247,12 @@
       completed: false,
       createdAt: Date.now(),
       priority: $("#priority-input").value,
-      dueDate: $("#due-input").value
+      dueDate: $("#due-input").value,
+      dueTime: $("#time-input").value
     });
     input.value = "";
     $("#due-input").value = "";
+    $("#time-input").value = "";
     $("#priority-input").value = "medium";
     filter = "all";
     $$(".filter-btn").forEach(function (button) {
@@ -301,7 +313,8 @@
           completed: Boolean(task.completed),
           createdAt: Number(task.createdAt) || Date.now(),
           priority: ["low", "medium", "high"].includes(task.priority) ? task.priority : "medium",
-          dueDate: dueDate
+          dueDate: dueDate,
+          dueTime: typeof task.dueTime === "string" && /^\d{2}:\d{2}$/.test(task.dueTime) ? task.dueTime : ""
         };
       });
       if (!cleaned.length && imported.length) throw new Error("No valid tasks were found in this backup.");
@@ -393,6 +406,55 @@
       });
     });
   }
+
+  const reminderButton = $("#reminder-btn");
+  function updateReminderButton() {
+    const granted = "Notification" in window && Notification.permission === "granted";
+    reminderButton.innerHTML = (granted ? "🔔" : "🔕") + "<span>" + (granted ? "Reminders enabled" : "Enable reminders") + "</span>";
+    reminderButton.title = granted ? "Browser notifications are enabled" : "Allow notifications for task reminders";
+  }
+  reminderButton.addEventListener("click", async function () {
+    if (!("Notification" in window)) { showToast("This browser does not support notifications"); return; }
+    if (Notification.permission === "granted") { showToast("Task reminders are enabled"); return; }
+    if (Notification.permission === "denied") { showToast("Notifications are blocked in browser settings"); return; }
+    try {
+      const permission = await Notification.requestPermission();
+      updateReminderButton();
+      showToast(permission === "granted" ? "Reminders enabled — keep TaskFlow open for alerts" : "Notification permission was not granted");
+    } catch (_) { showToast("Could not enable notifications in this browser"); }
+  });
+  function notifyTask(task) {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const title = "TaskFlow reminder";
+    const options = { body: task.title + " is due now.", tag: "taskflow-" + task.id, icon: "./favicon.svg", badge: "./favicon.svg", data: { taskId: task.id } };
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.ready.then(function (registration) {
+        if (registration.showNotification) return registration.showNotification(title, options);
+        return new Notification(title, options);
+      }).catch(function () { try { new Notification(title, options); } catch (_) {} });
+    } else { try { new Notification(title, options); } catch (_) {} }
+  }
+  let lastReminderCheck = Date.now();
+  function checkReminders() {
+    const now = Date.now();
+    let notified = [];
+    try { notified = JSON.parse(safeGet(NOTIFIED_KEY) || "[]"); } catch (_) {}
+    const notifiedSet = new Set(Array.isArray(notified) ? notified : []);
+    tasks.forEach(function (task) {
+      if (task.completed || !task.dueDate || !task.dueTime) return;
+      const dueAt = new Date(task.dueDate + "T" + task.dueTime).getTime();
+      const reminderId = task.id + "|" + task.dueDate + "|" + task.dueTime;
+      if (Number.isFinite(dueAt) && dueAt > lastReminderCheck && dueAt <= now && !notifiedSet.has(reminderId)) {
+        notifiedSet.add(reminderId);
+        notifyTask(task);
+      }
+    });
+    lastReminderCheck = now;
+    try { localStorage.setItem(NOTIFIED_KEY, JSON.stringify(Array.from(notifiedSet).slice(-500))); } catch (_) {}
+  }
+  updateReminderButton();
+  window.setInterval(checkReminders, 15000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) checkReminders(); });
 
   updateThemeIcon();
   render();
