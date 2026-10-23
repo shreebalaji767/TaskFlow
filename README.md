@@ -15,6 +15,8 @@
 - **Progress dashboard** — see total, active, and completed task counts plus a completion bar.
 - **Light and dark themes** — choose a comfortable look; the theme preference is saved.
 - **Export and backup** — download tasks as a JSON file.
+- **Installable PWA** — install TaskFlow on supported browsers and use its cached app shell offline after the first successful load.
+- **App icon** — custom SVG favicon and app icon.
 - **Keyboard shortcuts** — press `/` to focus search, or `Ctrl+K` (`⌘K` on Mac) to focus search.
 - **Responsive design** — works on desktop, tablet, and mobile.
 - **No frameworks or build step** — plain browser JavaScript, no package installation required.
@@ -24,7 +26,9 @@
 TaskFlow uses **vanilla JavaScript** to create the app interface and inject its styles at runtime:
 
 - `app.js` creates the page elements, adds styles through a dynamically created `<style>` element, and handles application behavior.
-- `index.html` stays minimal and only loads `app.js`.
+- `index.html` stays minimal, links the favicon and web app manifest, and loads `app.js`.
+- `app.js` creates the install button, handles supported browser install prompts, and registers the service worker.
+- `manifest.webmanifest` describes the installable app; `sw.js` caches the app shell for offline loading.
 - There is **no separate CSS file** and no frontend framework.
 
 Browsers still use HTML and CSS internally to display a webpage, but you do not need to maintain separate HTML layout or CSS stylesheet files for the app interface.
@@ -44,6 +48,7 @@ This repository includes a GitHub Actions workflow at `.github/workflows/deploy.
 2. Under **Build and deployment**, set the source to **GitHub Actions**.
 3. Push changes to the `main` branch, or manually run the deployment workflow from the **Actions** tab.
 4. Wait for the workflow to complete successfully.
+5. Open the deployed site over HTTPS, then use **Install app** in TaskFlow or your browser menu when the browser offers installation. On iPhone/iPad, open the site in Safari, tap **Share → Add to Home Screen**.
 
 When deployment succeeds, the website is available at:
 
@@ -62,6 +67,9 @@ When deployment succeeds, the website is available at:
 TaskFlow/
 ├── index.html                 # Minimal entry point
 ├── app.js                     # UI generation, injected styles, and app logic
+├── favicon.svg                # TaskFlow app icon and favicon
+├── manifest.webmanifest       # PWA metadata and install settings
+├── sw.js                      # Service worker for app-shell caching
 ├── README.md                  # Project documentation
 └── .github/
     └── workflows/
