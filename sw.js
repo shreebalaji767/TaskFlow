@@ -1,10 +1,11 @@
-const CACHE_NAME = "taskflow-shell-v4";
+const CACHE_NAME = "taskflow-shell-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./app.js",
   "./manifest.webmanifest",
-  "./favicon.svg"
+  "./favicon.svg",
+  "./favicon.ico"
 ];
 
 self.addEventListener("install", (event) => {
