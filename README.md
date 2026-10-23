@@ -10,7 +10,7 @@
 - **Task management** — add, edit, complete, and delete tasks.
 - **Priority levels** — label tasks as high, medium, or low priority.
 - **Due dates and times** — set a due date and exact reminder time; overdue tasks are highlighted.
-- **Browser notifications** — enable notifications and receive a reminder when a task is due while TaskFlow is open. Browser permission is required.
+- **Browser notifications** — after you enable notifications, TaskFlow checks due tasks while the app is running and can show one catch-up notification for a task that became overdue within the last 24 hours when you reopen or return to the app. Browser permission is required. Because this is a static, localStorage-only site with no server, notifications cannot be guaranteed while the browser/site is fully closed.
 - **Search and filters** — find tasks and switch between all, active, and completed.
 - **Sorting** — organize by newest, oldest, priority, or due date.
 - **Progress dashboard** — see total, active, and completed task counts plus a completion bar.
@@ -28,7 +28,7 @@ TaskFlow uses **vanilla JavaScript** to create the app interface and inject its 
 
 - `app.js` creates the page elements, adds styles through a dynamically created `<style>` element, and handles application behavior.
 - `index.html` stays minimal, links the favicon and web app manifest, and loads `app.js`.
-- `app.js` creates the install and reminder controls, handles supported browser install prompts and browser notifications, and registers the service worker.
+- `app.js` creates the install and reminder controls, requests notification permission after explaining the limitation, checks due tasks while running, and checks for recent missed reminders when reopened. A static site cannot schedule reliable notifications while the browser/site is fully closed; this would require a background push service.
 - `manifest.webmanifest` describes the installable app; `sw.js` caches the app shell for offline loading.
 - There is **no separate CSS file** and no frontend framework.
 
@@ -57,7 +57,7 @@ When deployment succeeds, the website is available at:
 
 ## Data and privacy
 
-- Tasks and theme preference are saved in your browser using `localStorage`.
+- Tasks, theme preference, and reminder de-duplication records are saved in your browser using `localStorage`.
 - Data stays in that browser on that device; it is **not automatically synced** across browsers or devices.
 - Clearing browser site data can remove saved tasks. Use **Export tasks** to download a JSON backup.
 - Avoid putting passwords, financial details, medical information, or other sensitive data into task titles.
