@@ -406,7 +406,7 @@
 
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./sw.js?v=8").catch(function (error) {
+      navigator.serviceWorker.register("./sw.js?v=9").catch(function (error) {
         console.warn("TaskFlow offline support could not be enabled:", error);
       });
     });
@@ -456,6 +456,7 @@
   // On startup or return, deliver one catch-up notification for tasks overdue by <=24 hours.
   let lastReminderCheck = Date.now();
   function checkReminders(includeRecentMisses) {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
     const now = Date.now();
     let notified = [];
     try { notified = JSON.parse(safeGet(NOTIFIED_KEY) || "[]"); } catch (_) {}
