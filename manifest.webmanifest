@@ -10,7 +10,13 @@
   "theme_color": "#6658e8",
   "icons": [
     {
-      "src": "/TaskFlow/favicon.svg?v=3",
+      "src": "./favicon.ico?v=1",
+      "sizes": "64x64",
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "./favicon.svg?v=3",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
