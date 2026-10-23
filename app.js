@@ -5,7 +5,7 @@
   const THEME_KEY = "taskflow.theme.v1";
 
   const styles = document.createElement("style");
-  styles.textContent = \`
+  styles.textContent = `
     :root{color-scheme:light;--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#758098;--line:#e7eaf1;--primary:#4f46e5;--primary-soft:#eeedff;--green:#15966a;--shadow:0 20px 60px rgba(27,39,74,.09)}
     :root[data-theme="dark"]{color-scheme:dark;--bg:#101522;--panel:#181f2e;--text:#eef2ff;--muted:#9aa6bf;--line:#2a3346;--primary:#a5a0ff;--primary-soft:#292746;--green:#57d6a4;--shadow:0 20px 60px rgba(0,0,0,.18)}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;transition:background .2s,color .2s}
@@ -26,11 +26,11 @@
     @keyframes appear{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
     @media(max-width:560px){.app{padding-top:24px}.topbar{margin-bottom:28px}.stats{gap:8px;margin:21px 0}.stat{padding:13px 11px;border-radius:15px}.stat-top{font-size:10px;gap:4px}.stat-icon{width:26px;height:26px}.stat-number{font-size:24px}.board{padding:16px;border-radius:18px}.tools{align-items:stretch;flex-direction:column}.search-wrap{width:100%}.search-input{padding-top:11px;padding-bottom:11px}.add-btn{padding:0 13px}.task-item{padding:11px 8px;gap:9px}.task-actions{opacity:1}.mini-btn{width:28px;height:30px}.today{font-size:10px}.intro h1{letter-spacing:-1.2px}}
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-  \`;
+  `;
   document.head.appendChild(styles);
 
   document.documentElement.dataset.theme = safeGet(THEME_KEY) || "light";
-  document.body.innerHTML = \`
+  document.body.innerHTML = `
     <main class="app">
       <header class="topbar">
         <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></span>TaskFlow</div>
@@ -52,7 +52,7 @@
       <div class="notice" id="storage-note">Your tasks stay in this browser on this device.</div>
       <footer class="footer">Made for a calmer mind · <strong>TaskFlow</strong></footer>
     </main><div class="toast" id="toast" role="status" aria-live="polite"></div>
-  \`;
+  `;
 
   const $ = (selector) => document.querySelector(selector);
   let tasks = loadTasks();
