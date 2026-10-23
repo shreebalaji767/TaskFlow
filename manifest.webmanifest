@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "TaskFlow — Your day, organized",
+  "short_name": "TaskFlow",
+  "description": "A simple, private task manager that saves tasks in your browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f6fb",
+  "theme_color": "#6658e8",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
