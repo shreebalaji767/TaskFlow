@@ -420,12 +420,24 @@
   }
   reminderButton.addEventListener("click", async function () {
     if (!("Notification" in window)) { showToast("This browser does not support notifications"); return; }
-    if (Notification.permission === "granted") { showToast("Task reminders are enabled"); return; }
+    if (Notification.permission === "granted") {
+      showToast("Notifications allowed. Keep TaskFlow open for on-time alerts; reopening can show recent missed reminders.");
+      return;
+    }
     if (Notification.permission === "denied") { showToast("Notifications are blocked in browser settings"); return; }
+    const understood = window.confirm(
+      "Enable TaskFlow notifications?\n\nTaskFlow stores tasks only in this browser and has no server. Notifications can appear while the app is running. If you close the site/browser, alerts cannot be guaranteed; when you reopen TaskFlow, it can show reminders missed in the last 24 hours.\n\nContinue to browser permission?"
+    );
+    if (!understood) return;
     try {
       const permission = await Notification.requestPermission();
       updateReminderButton();
-      showToast(permission === "granted" ? "Reminders enabled — keep TaskFlow open for alerts" : "Notification permission was not granted");
+      if (permission === "granted") {
+        showToast("Notifications allowed — on-time alerts need TaskFlow running");
+        checkReminders(true);
+      } else {
+        showToast("Notification permission was not granted");
+      }
     } catch (_) { showToast("Could not enable notifications in this browser"); }
   });
   function notifyTask(task, isMissed) {
