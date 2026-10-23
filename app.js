@@ -93,7 +93,7 @@
     '  <article class="stat"><div class="stat-top"><span>Completed</span><span class="stat-icon">' + icons.done + '</span></div><div class="stat-number green" id="done-count">0</div></article>',
     ' </section>',
     ' <section class="board" aria-labelledby="board-title">',
-    '  <div class="board-head"><div><h2 id="board-title">Your tasks</h2><div class="board-caption">Capture it, prioritize it, get it done.</div></div><div class="board-head-actions"><button class="export-btn install-btn" id="install-btn" type="button" hidden><span class="install-icon">↓</span><span>Install app</span></button><button class="export-btn reminder-btn" id="reminder-btn" type="button" title="Enable browser reminders">🔔<span>Enable reminders</span></button><button class="export-btn" id="import-btn" type="button">↥<span>Import backup</span></button><input id="import-input" type="file" accept="application/json,.json" hidden><button class="export-btn" id="export-btn" type="button">' + icons.export + '<span>Export tasks</span></button></div></div>',
+    '  <div class="board-head"><div><h2 id="board-title">Your tasks</h2><div class="board-caption">Capture it, prioritize it, get it done.</div></div><div class="board-head-actions"><button class="export-btn install-btn" id="install-btn" type="button" hidden><span class="install-icon">↓</span><span>Install app</span></button><button class="export-btn reminder-btn" id="reminder-btn" type="button" title="Enable browser reminders">🔔<span>Enable reminders</span></button><button class="export-btn" id="calendar-btn" type="button" title="Export reminders to your calendar">▦<span>Calendar reminders</span></button><button class="export-btn" id="import-btn" type="button">↥<span>Import backup</span></button><input id="import-input" type="file" accept="application/json,.json" hidden><button class="export-btn" id="export-btn" type="button">' + icons.export + '<span>Export tasks</span></button></div></div>',
     '  <form class="add-form" id="add-form"><label class="sr-only" for="task-input">Task name</label><input class="field" id="task-input" maxlength="200" autocomplete="off" placeholder="What needs to get done?" required><label class="sr-only" for="priority-input">Priority</label><select class="field" id="priority-input"><option value="medium">◈ Medium priority</option><option value="high">▲ High priority</option><option value="low">▽ Low priority</option></select><label class="sr-only" for="due-input">Due date</label><input class="field" id="due-input" type="date" aria-label="Optional due date"><label class="sr-only" for="time-input">Reminder time</label><input class="field" id="time-input" type="time" aria-label="Optional reminder time"><button class="add-btn" type="submit">' + icons.check + '<span>Add task</span></button></form>',
     '  <div class="tools"><nav class="filters" aria-label="Filter tasks"><button class="filter-btn active" data-filter="all" type="button" aria-pressed="true">All</button><button class="filter-btn" data-filter="active" type="button" aria-pressed="false">Active</button><button class="filter-btn" data-filter="completed" type="button" aria-pressed="false">Completed</button></nav><div class="tool-right"><label class="sr-only" for="search-input">Search tasks</label><input class="field search" id="search-input" type="search" placeholder="Search tasks..."><label class="sr-only" for="sort-select">Sort tasks</label><select class="field sort" id="sort-select"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="priority">Priority</option><option value="due">Due date</option></select></div></div>',
     '  <div class="task-list" id="task-list" aria-live="polite"></div>',
@@ -348,6 +348,61 @@
     URL.revokeObjectURL(url);
     showToast("Your task backup is ready");
   });
+
+  // Export reminders to the user's own calendar; no account, server, or paid service required.
+  $("#calendar-btn").addEventListener("click", function () {
+    const upcoming = tasks.filter(function (task) {
+      return !task.completed && task.dueDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(task.dueDate);
+    });
+    if (!upcoming.length) {
+      showToast("Add a due date to a task before exporting calendar reminders");
+      return;
+    }
+    function escapeICS(value) {
+      return String(value || "").replace(/\\\\/g, "\\\\\\\\").replace(/\\r?\\n/g, "\\\\n").replace(/,/g, "\\\\,").replace(/;/g, "\\\\;");
+    }
+    function localStamp(date, time) {
+      return date.replace(/-/g, "") + "T" + (time || "09:00").replace(":", "") + "00";
+    }
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\\.\\d{3}/, "");
+    const events = upcoming.map(function (task) {
+      const start = localStamp(task.dueDate, task.dueTime);
+      const startDate = task.dueDate.replace(/-/g, "");
+      const end = localStamp(task.dueDate, task.dueTime ? addMinutes(task.dueTime, 15) : "09:15");
+      return [
+        "BEGIN:VEVENT",
+        "UID:" + escapeICS(task.id) + "@taskflow.local",
+        "DTSTAMP:" + stamp,
+        "DTSTART:" + start,
+        "DTEND:" + end,
+        "SUMMARY:" + escapeICS(task.title),
+        "DESCRIPTION:" + escapeICS("TaskFlow priority: " + task.priority + ". Imported from your local TaskFlow task list."),
+        "BEGIN:VALARM",
+        "TRIGGER:-PT15M",
+        "ACTION:DISPLAY",
+        "DESCRIPTION:" + escapeICS("Upcoming task: " + task.title),
+        "END:VALARM",
+        "END:VEVENT"
+      ].join("\\r\\n");
+    });
+    const calendar = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//TaskFlow//Local Reminders//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH"].concat(events).concat(["END:VCALENDAR"]).join("\\r\\n") + "\\r\\n";
+    const blob = new Blob([calendar], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "taskflow-reminders.ics";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast("Calendar file created — import it into your calendar app");
+  });
+
+  function addMinutes(time, minutes) {
+    const parts = time.split(":").map(Number);
+    const date = new Date(2000, 0, 1, parts[0], parts[1] + minutes);
+    return String(date.getHours()).padStart(2, "0") + ":" + String(date.getMinutes()).padStart(2, "0");
+  }
   document.addEventListener("keydown", function (event) {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
       event.preventDefault(); $("#search-input").focus();
@@ -406,7 +461,7 @@
 
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./sw.js?v=9").catch(function (error) {
+      navigator.serviceWorker.register("./sw.js?v=10").catch(function (error) {
         console.warn("TaskFlow offline support could not be enabled:", error);
       });
     });
