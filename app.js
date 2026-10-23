@@ -241,6 +241,11 @@
     const input = $("#task-input");
     const title = input.value.trim();
     if (!title) { input.focus(); return; }
+    if ($("#time-input").value && !$("#due-input").value) {
+      showToast("Choose a due date to set a reminder time");
+      $("#due-input").focus();
+      return;
+    }
     tasks.unshift({
       id: makeId(),
       title: title.slice(0, 200),
